@@ -1,4 +1,4 @@
-package ping
+package ping_controllers
 
 import (
 	"net/http"

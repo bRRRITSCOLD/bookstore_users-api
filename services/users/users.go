@@ -1,11 +1,11 @@
 package users
 
 import (
-	usersDomain "bookstore_users-api/domains/users"
-	errorsUtils "bookstore_users-api/utils/errors"
+	users_domain "bookstore_users-api/domains/users"
+	errors_utils "bookstore_users-api/utils/errors"
 )
 
-func CreateUser(user usersDomain.User) (*usersDomain.User, *errorsUtils.APIError) {
+func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
 	if validateUserErr := user.Validate(); validateUserErr != nil {
 		return nil, validateUserErr
 	}
@@ -17,8 +17,8 @@ func CreateUser(user usersDomain.User) (*usersDomain.User, *errorsUtils.APIError
 	return &user, nil
 }
 
-func GetUser(userId int64) (*usersDomain.User, *errorsUtils.APIError) {
-	user := usersDomain.User{UserID: userId}
+func GetUser(userId int64) (*users_domain.User, *errors_utils.APIError) {
+	user := users_domain.User{UserID: userId}
 	if getUserErr := user.GetByUserID(); getUserErr != nil {
 		return nil, getUserErr
 	}

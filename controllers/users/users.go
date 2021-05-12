@@ -1,4 +1,4 @@
-package users
+package users_controllers
 
 import (
 	usersDomain "bookstore_users-api/domains/users"

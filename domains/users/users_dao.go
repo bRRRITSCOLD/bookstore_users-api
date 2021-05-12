@@ -1,8 +1,9 @@
-package users
+package users_domain
 
 import (
-	datesUtils "bookstore_users-api/utils/dates"
-	errorsUtils "bookstore_users-api/utils/errors"
+	users_mysql_db "bookstore_users-api/datasources/users/mysql"
+	dates_utils "bookstore_users-api/utils/dates"
+	errors_utils "bookstore_users-api/utils/errors"
 	"fmt"
 )
 
@@ -10,10 +11,13 @@ var (
 	usersDB = make(map[int64]*User)
 )
 
-func (user *User) GetByUserID() *errorsUtils.APIError {
+func (user *User) GetByUserID() *errors_utils.APIError {
+	pingErr := users_mysql_db.Client.Ping()
+	errors_utils.PanicOnError(pingErr)
+
 	result := usersDB[user.UserID]
 	if result == nil {
-		return errorsUtils.NewNotFoundAPIError(
+		return errors_utils.NewNotFoundAPIError(
 			fmt.Sprintf("user %d not found", user.UserID),
 		)
 	}
@@ -27,20 +31,20 @@ func (user *User) GetByUserID() *errorsUtils.APIError {
 	return nil
 }
 
-func (user *User) Save() *errorsUtils.APIError {
+func (user *User) Save() *errors_utils.APIError {
 	foundUser := usersDB[user.UserID]
 	if foundUser != nil {
 		if foundUser.Email == user.Email {
-			return errorsUtils.NewNotFoundAPIError(
+			return errors_utils.NewNotFoundAPIError(
 				fmt.Sprintf("email %s already registered", user.Email),
 			)
 		}
-		return errorsUtils.NewNotFoundAPIError(
+		return errors_utils.NewNotFoundAPIError(
 			fmt.Sprintf("user %d already exists", user.UserID),
 		)
 	}
 
-	user.DateCreated = datesUtils.GetNowString()
+	user.DateCreated = dates_utils.GetNowString()
 
 	usersDB[user.UserID] = user
 

@@ -1,4 +1,4 @@
-package users
+package users_domain
 
 import (
 	errorsUtils "bookstore_users-api/utils/errors"
