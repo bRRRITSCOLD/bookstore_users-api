@@ -5,6 +5,12 @@ import (
 	dates_utils "bookstore_users-api/utils/dates"
 	errors_utils "bookstore_users-api/utils/errors"
 	"fmt"
+	"strings"
+)
+
+const (
+	USERS_MYSQL_DB_INSERT_USER_QUERY = "INSERT INTO users(firstName, lastName, email, dateCreated) VALUES(?, ?, ?, ?);"
+	USERS_MYSQL_DB_EMAIL_UNIQUE      = "email_UNIQUE"
 )
 
 var (
@@ -32,21 +38,35 @@ func (user *User) GetByUserID() *errors_utils.APIError {
 }
 
 func (user *User) Save() *errors_utils.APIError {
-	foundUser := usersDB[user.UserID]
-	if foundUser != nil {
-		if foundUser.Email == user.Email {
-			return errors_utils.NewNotFoundAPIError(
-				fmt.Sprintf("email %s already registered", user.Email),
-			)
-		}
-		return errors_utils.NewNotFoundAPIError(
-			fmt.Sprintf("user %d already exists", user.UserID),
-		)
+	stmt, prepareErr := users_mysql_db.Client.Prepare(USERS_MYSQL_DB_INSERT_USER_QUERY)
+	if prepareErr != nil {
+		return errors_utils.NewInternalServerAPIError(prepareErr.Error())
 	}
 
-	user.DateCreated = dates_utils.GetNowString()
+	defer stmt.Close()
 
-	usersDB[user.UserID] = user
+	user.DateCreated = dates_utils.GetNow()
+
+	insertResult, insertErr := stmt.Exec(
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.DateCreated,
+	)
+	if insertErr != nil {
+		if strings.Contains(insertErr.Error(), USERS_MYSQL_DB_EMAIL_UNIQUE) {
+			return errors_utils.NewBadRequestAPIError(fmt.Sprintf("email %s already exists", user.Email))
+		}
+
+		return errors_utils.NewInternalServerAPIError(insertErr.Error())
+	}
+
+	userId, lastInsertedIDErr := insertResult.LastInsertId()
+	if lastInsertedIDErr != nil {
+		return errors_utils.NewInternalServerAPIError(lastInsertedIDErr.Error())
+	}
+
+	user.UserID = userId
 
 	return nil
 }

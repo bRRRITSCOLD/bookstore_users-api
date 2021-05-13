@@ -2,14 +2,15 @@ package users_domain
 
 import (
 	errorsUtils "bookstore_users-api/utils/errors"
+	"time"
 )
 
 type User struct {
-	UserID      int64  `json:"userId"`
-	FirstName   string `json:"firstName"`
-	LastName    string `json:"lastName"`
-	Email       string `json:"email"`
-	DateCreated string `json:"dateCreated"`
+	UserID      int64     `json:"userId"`
+	FirstName   string    `json:"firstName"`
+	LastName    string    `json:"lastName"`
+	Email       string    `json:"email"`
+	DateCreated time.Time `json:"dateCreated"`
 }
 
 func NewUser(user *User) *User {
