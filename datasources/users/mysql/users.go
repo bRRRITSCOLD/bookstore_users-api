@@ -3,10 +3,13 @@ package users_mysql_db
 import (
 	errors_utils "bookstore_users-api/utils/errors"
 	"os"
+	"strings"
 
-	"database/sql"
 	"fmt"
 	"log"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/jmoiron/sqlx/reflectx"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -19,7 +22,7 @@ const (
 )
 
 var (
-	Client *sql.DB
+	Client *sqlx.DB
 
 	username = os.Getenv(USERS_MYSQL_DB_USERNAME)
 	password = os.Getenv(USERS_MYSQL_DB_PASSWORD)
@@ -29,7 +32,7 @@ var (
 
 func init() {
 	datasourceName := fmt.Sprintf(
-		"%s:%s@tcp(%s)/%s?charset=utf8",
+		"%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true",
 		username,
 		password,
 		host,
@@ -37,11 +40,13 @@ func init() {
 	)
 
 	var openErr error
-	Client, openErr = sql.Open("mysql", datasourceName)
+	Client, openErr = sqlx.Open("mysql", datasourceName)
 	errors_utils.PanicOnError(openErr)
 
 	pingErr := Client.Ping()
 	errors_utils.PanicOnError(pingErr)
+
+	Client.Mapper = reflectx.NewMapperFunc("mysql", strings.ToLower)
 
 	// mysql.SetLogger()
 	log.Println("database successfully configured")
