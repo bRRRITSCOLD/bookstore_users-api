@@ -45,6 +45,60 @@ func GetUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, getUserResult)
 }
 
+func PutUser(c *gin.Context) {
+	userId, userIdErr := strconv.ParseInt(c.Param("userId"), 10, 64)
+	if userIdErr != nil {
+		apiError := errorsUtils.NewBadRequestAPIError("invalid user id")
+		c.JSON(apiError.Status, apiError)
+		return
+	}
+
+	var user usersDomain.User
+
+	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
+		apiError := errorsUtils.NewBadRequestAPIError("invalid json body")
+		c.JSON(apiError.Status, apiError)
+		return
+	}
+
+	user.UserID = userId
+
+	updateUserResult, updateUserErr := usersService.PutUser(user)
+	if updateUserErr != nil {
+		c.JSON(updateUserErr.Status, updateUserErr)
+		return
+	}
+
+	c.JSON(http.StatusCreated, updateUserResult)
+}
+
+func PatchUser(c *gin.Context) {
+	userId, userIdErr := strconv.ParseInt(c.Param("userId"), 10, 64)
+	if userIdErr != nil {
+		apiError := errorsUtils.NewBadRequestAPIError("invalid user id")
+		c.JSON(apiError.Status, apiError)
+		return
+	}
+
+	var user usersDomain.User
+
+	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
+		apiError := errorsUtils.NewBadRequestAPIError("invalid json body")
+		c.JSON(apiError.Status, apiError)
+		return
+	}
+
+	user.UserID = userId
+
+	updateUserResult, updateUserErr := usersService.PatchUser(user)
+	if updateUserErr != nil {
+		c.JSON(updateUserErr.Status, updateUserErr)
+		return
+	}
+
+	c.JSON(http.StatusCreated, updateUserResult)
+}
+
 // func SearchUsers(c *gin.Context) {
 // 	c.String(http.StatusNotImplemented, "implement me")
 // }
