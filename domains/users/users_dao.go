@@ -4,8 +4,6 @@ import (
 	users_mysql_db "bookstore_users-api/datasources/users/mysql"
 	dates_utils "bookstore_users-api/utils/dates"
 	errors_utils "bookstore_users-api/utils/errors"
-	"fmt"
-	"strings"
 )
 
 const (
@@ -23,10 +21,7 @@ func (user *User) GetByUserID() *errors_utils.APIError {
 	var foundUser User
 	queryRowResult := stmt.QueryRowx(user.UserID)
 	if scanStructErr := queryRowResult.StructScan(&foundUser); scanStructErr != nil {
-		if strings.Contains(scanStructErr.Error(), USERS_MYSQL_DB_NO_ROWS) {
-			return errors_utils.NewNotFoundAPIError(fmt.Sprintf("user %d not found", user.UserID))
-		}
-		return errors_utils.NewInternalServerAPIError(scanStructErr.Error())
+		return errors_utils.ParseMySQLError(scanStructErr)
 	}
 
 	user.UserID = foundUser.UserID
@@ -55,11 +50,7 @@ func (user *User) Save() *errors_utils.APIError {
 		user.DateCreated,
 	)
 	if insertErr != nil {
-		if strings.Contains(insertErr.Error(), USERS_MYSQL_DB_EMAIL_UNIQUE) {
-			return errors_utils.NewBadRequestAPIError(fmt.Sprintf("email %s already exists", user.Email))
-		}
-
-		return errors_utils.NewInternalServerAPIError(insertErr.Error())
+		return errors_utils.ParseMySQLError(insertErr)
 	}
 
 	userId, lastInsertedIDErr := insertResult.LastInsertId()
