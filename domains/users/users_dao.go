@@ -8,6 +8,7 @@ import (
 
 const (
 	USERS_MYSQL_DB_INSERT_USER_QUERY = "INSERT INTO users(firstName, lastName, email, dateCreated) VALUES(?, ?, ?, ?);"
+	USERS_MYSQL_DB_PUT_USER_QUERY    = "UPDATE users SET firstName=?, lastName=?, email=? WHERE id=?;"
 	USERS_MYSQL_DB_SELECT_USER_QUERY = "SELECT * from users WHERE id=?;"
 	USERS_MYSQL_DB_EMAIL_UNIQUE      = "email_UNIQUE"
 	USERS_MYSQL_DB_NO_ROWS           = "sql: no rows in result set"
@@ -59,6 +60,29 @@ func (user *User) Save() *errors_utils.APIError {
 	}
 
 	user.UserID = userId
+
+	return nil
+}
+
+func (user *User) PutByUserID() *errors_utils.APIError {
+	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_PUT_USER_QUERY)
+	if prepareErr != nil {
+		return errors_utils.NewInternalServerAPIError(prepareErr.Error())
+	}
+
+	defer stmt.Close()
+
+	user.DateCreated = dates_utils.GetNow()
+
+	_, putErr := stmt.Exec(
+		user.FirstName,
+		user.LastName,
+		user.Email,
+		user.UserID,
+	)
+	if putErr != nil {
+		return errors_utils.ParseMySQLError(putErr)
+	}
 
 	return nil
 }

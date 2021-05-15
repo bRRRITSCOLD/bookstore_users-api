@@ -25,6 +25,46 @@ func GetUser(userId int64) (*users_domain.User, *errors_utils.APIError) {
 	return &user, nil
 }
 
+func PutUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+	if validateUserErr := user.Validate(); validateUserErr != nil {
+		return nil, validateUserErr
+	}
+
+	currentUser, getUserErr := GetUser(user.UserID)
+	if getUserErr != nil {
+		return nil, getUserErr
+	}
+
+	currentUser.FirstName = user.FirstName
+	currentUser.LastName = user.LastName
+	currentUser.Email = user.Email
+
+	currentUser.PutByUserID()
+
+	return currentUser, nil
+}
+
+func PatchUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+	currentUser, getUserErr := GetUser(user.UserID)
+	if getUserErr != nil {
+		return nil, getUserErr
+	}
+
+	if user.FirstName != "" {
+		currentUser.FirstName = user.FirstName
+	}
+	if user.LastName != "" {
+		currentUser.LastName = user.LastName
+	}
+	if user.Email != "" {
+		currentUser.Email = user.Email
+	}
+
+	currentUser.PutByUserID()
+
+	return currentUser, nil
+}
+
 func FindUser() {
 
 }
