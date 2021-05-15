@@ -19,6 +19,7 @@ func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIEr
 
 func GetUser(userId int64) (*users_domain.User, *errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
+
 	if getUserErr := user.GetByUserID(); getUserErr != nil {
 		return nil, getUserErr
 	}
@@ -63,6 +64,16 @@ func PatchUser(user users_domain.User) (*users_domain.User, *errors_utils.APIErr
 	currentUser.PutByUserID()
 
 	return currentUser, nil
+}
+
+func DeleteUser(userId int64) (bool, *errors_utils.APIError) {
+	user := users_domain.User{UserID: userId}
+
+	if deleteUserErr := user.DeleteByUserID(); deleteUserErr != nil {
+		return false, deleteUserErr
+	}
+
+	return true, nil
 }
 
 func FindUser() {
