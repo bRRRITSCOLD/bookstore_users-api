@@ -11,6 +11,8 @@ type User struct {
 	LastName    string    `json:"lastName" mysql:"lastName"`
 	Email       string    `json:"email" mysql:"email"`
 	DateCreated time.Time `json:"dateCreated" mysql:"dateCreated"`
+	Status      string    `json:"status"`
+	Password    string    `json:"-"`
 }
 
 func NewUser(user *User) *User {
@@ -20,6 +22,10 @@ func NewUser(user *User) *User {
 func (user *User) Validate() *errorsUtils.APIError {
 	if user.Email == "" {
 		return errorsUtils.NewBadRequestAPIError("invalid email address")
+	}
+
+	if user.Password == "" {
+		return errorsUtils.NewBadRequestAPIError("invalid password")
 	}
 	return nil
 }

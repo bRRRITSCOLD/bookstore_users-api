@@ -4,15 +4,17 @@ import (
 	users_mysql_db "bookstore_users-api/datasources/users/mysql"
 	dates_utils "bookstore_users-api/utils/dates"
 	errors_utils "bookstore_users-api/utils/errors"
+	"fmt"
 )
 
 const (
-	USERS_MYSQL_DB_INSERT_USER_QUERY       = "INSERT INTO users(firstName, lastName, email, dateCreated) VALUES(?, ?, ?, ?);"
-	USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY    = "UPDATE users SET firstName=?, lastName=?, email=? WHERE id=?;"
-	USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY = "SELECT * from users WHERE id=?;"
-	USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY = "DELETE FROM users WHERE id=?"
-	USERS_MYSQL_DB_EMAIL_UNIQUE            = "email_UNIQUE"
-	USERS_MYSQL_DB_NO_ROWS                 = "sql: no rows in result set"
+	USERS_MYSQL_DB_INSERT_USER_QUERY            = "INSERT INTO users(firstName, lastName, email, dateCreated) VALUES(?, ?, ?, ?);"
+	USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY         = "UPDATE users SET firstName=?, lastName=?, email=? WHERE id=?;"
+	USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY      = "SELECT * from users WHERE id=?;"
+	USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY = "SELECT * from users WHERE status=?;"
+	USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY      = "DELETE FROM users WHERE id=?"
+	USERS_MYSQL_DB_EMAIL_UNIQUE                 = "email_UNIQUE"
+	USERS_MYSQL_DB_NO_ROWS                      = "sql: no rows in result set"
 )
 
 func (user *User) GetByUserID() *errors_utils.APIError {
@@ -46,8 +48,6 @@ func (user *User) Save() *errors_utils.APIError {
 	}
 
 	defer stmt.Close()
-
-	user.DateCreated = dates_utils.GetNow()
 
 	insertResult, insertErr := stmt.Exec(
 		user.FirstName,
@@ -105,4 +105,49 @@ func (user *User) DeleteByUserID() *errors_utils.APIError {
 	}
 
 	return nil
+}
+
+func (user *User) GetUsersByStatus(status string) ([]User, *errors_utils.APIError) {
+	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY)
+	if prepareErr != nil {
+		return nil, errors_utils.NewInternalServerAPIError(prepareErr.Error())
+	}
+
+	defer stmt.Close()
+
+	queryxRows, queryxErr := stmt.Queryx(status)
+	if queryxErr != nil {
+		return nil, errors_utils.NewInternalServerAPIError(queryxErr.Error())
+	}
+
+	defer queryxRows.Close()
+
+	foundUsers := make([]User, 0)
+
+	for queryxRows.Next() {
+		var foundUser User
+
+		if scanStructErr := queryxRows.StructScan(&foundUser); scanStructErr != nil {
+			return nil, errors_utils.ParseMySQLError(scanStructErr)
+		}
+
+		foundUsers = append(foundUsers, foundUser)
+	}
+
+	if len(foundUsers) == 0 {
+		return nil, errors_utils.NewNotFoundAPIError(fmt.Sprintf("no users found matching status %s", status))
+	}
+
+	return foundUsers, nil
+	// if scanStructErr := queryRowResult.StructScan(&foundUser); scanStructErr != nil {
+	// 	return errors_utils.ParseMySQLError(scanStructErr)
+	// }
+
+	// user.UserID = foundUser.UserID
+	// user.Email = foundUser.Email
+	// user.FirstName = foundUser.FirstName
+	// user.LastName = foundUser.LastName
+	// user.DateCreated = foundUser.DateCreated
+
+	// return nil
 }

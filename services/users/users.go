@@ -2,6 +2,7 @@ package users
 
 import (
 	users_domain "bookstore_users-api/domains/users"
+	dates_utils "bookstore_users-api/utils/dates"
 	errors_utils "bookstore_users-api/utils/errors"
 )
 
@@ -10,6 +11,9 @@ func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIEr
 		return nil, validateUserErr
 	}
 
+	user.DateCreated = dates_utils.GetNow()
+	user.Status = "active"
+
 	if saveUserErr := user.Save(); saveUserErr != nil {
 		return nil, saveUserErr
 	}
@@ -17,7 +21,7 @@ func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIEr
 	return &user, nil
 }
 
-func GetUser(userId int64) (*users_domain.User, *errors_utils.APIError) {
+func GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
 
 	if getUserErr := user.GetByUserID(); getUserErr != nil {
@@ -26,12 +30,12 @@ func GetUser(userId int64) (*users_domain.User, *errors_utils.APIError) {
 	return &user, nil
 }
 
-func PutUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+func PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
 	if validateUserErr := user.Validate(); validateUserErr != nil {
 		return nil, validateUserErr
 	}
 
-	currentUser, getUserErr := GetUser(user.UserID)
+	currentUser, getUserErr := GetUserByUserID(user.UserID)
 	if getUserErr != nil {
 		return nil, getUserErr
 	}
@@ -45,8 +49,8 @@ func PutUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError
 	return currentUser, nil
 }
 
-func PatchUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
-	currentUser, getUserErr := GetUser(user.UserID)
+func PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+	currentUser, getUserErr := GetUserByUserID(user.UserID)
 	if getUserErr != nil {
 		return nil, getUserErr
 	}
@@ -66,7 +70,7 @@ func PatchUser(user users_domain.User) (*users_domain.User, *errors_utils.APIErr
 	return currentUser, nil
 }
 
-func DeleteUser(userId int64) (bool, *errors_utils.APIError) {
+func DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
 
 	if deleteUserErr := user.DeleteByUserID(); deleteUserErr != nil {
@@ -76,6 +80,7 @@ func DeleteUser(userId int64) (bool, *errors_utils.APIError) {
 	return true, nil
 }
 
-func FindUser() {
-
+func SearchUsers(status string) ([]users_domain.User, *errors_utils.APIError) {
+	dao := &users_domain.User{}
+	return dao.GetUsersByStatus(status)
 }

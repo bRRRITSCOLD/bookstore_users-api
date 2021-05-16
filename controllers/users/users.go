@@ -36,14 +36,14 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, createUserResult)
 }
 
-func GetUser(c *gin.Context) {
+func GetUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
 		c.JSON(userIdErr.Status, userIdErr)
 		return
 	}
 
-	getUserResult, getUserErr := users_service.GetUser(userId)
+	getUserResult, getUserErr := users_service.GetUserByUserID(userId)
 	if getUserErr != nil {
 		c.JSON(getUserErr.Status, getUserErr)
 		return
@@ -52,7 +52,7 @@ func GetUser(c *gin.Context) {
 	c.JSON(http.StatusOK, getUserResult)
 }
 
-func PutUser(c *gin.Context) {
+func PutUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
 		c.JSON(userIdErr.Status, userIdErr)
@@ -69,7 +69,7 @@ func PutUser(c *gin.Context) {
 
 	user.UserID = userId
 
-	updateUserResult, updateUserErr := users_service.PutUser(user)
+	updateUserResult, updateUserErr := users_service.PutUserByUserID(user)
 	if updateUserErr != nil {
 		c.JSON(updateUserErr.Status, updateUserErr)
 		return
@@ -78,7 +78,7 @@ func PutUser(c *gin.Context) {
 	c.JSON(http.StatusOK, updateUserResult)
 }
 
-func PatchUser(c *gin.Context) {
+func PatchUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
 		c.JSON(userIdErr.Status, userIdErr)
@@ -95,7 +95,7 @@ func PatchUser(c *gin.Context) {
 
 	user.UserID = userId
 
-	updateUserResult, updateUserErr := users_service.PatchUser(user)
+	updateUserResult, updateUserErr := users_service.PatchUserByUserID(user)
 	if updateUserErr != nil {
 		c.JSON(updateUserErr.Status, updateUserErr)
 		return
@@ -104,14 +104,14 @@ func PatchUser(c *gin.Context) {
 	c.JSON(http.StatusOK, updateUserResult)
 }
 
-func DeleteUser(c *gin.Context) {
+func DeleteUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
 		c.JSON(userIdErr.Status, userIdErr)
 		return
 	}
 
-	deleteUserResult, deleteUserErr := users_service.DeleteUser(userId)
+	deleteUserResult, deleteUserErr := users_service.DeleteUserByUserID(userId)
 	if deleteUserErr != nil {
 		c.JSON(deleteUserErr.Status, deleteUserErr)
 		return
@@ -121,6 +121,14 @@ func DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusNoContent, map[string]bool{"delete": deleteUserResult})
 }
 
-// func SearchUsers(c *gin.Context) {
-// 	c.String(http.StatusNotImplemented, "implement me")
-// }
+func SearchUsers(c *gin.Context) {
+	status := c.Query("status")
+
+	users, err := users_service.SearchUsers(status)
+	if err != nil {
+		c.JSON(err.Status, err)
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
