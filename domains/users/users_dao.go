@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	USERS_MYSQL_DB_INSERT_USER_QUERY            = "INSERT INTO users(firstName, lastName, email, dateCreated) VALUES(?, ?, ?, ?);"
-	USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY         = "UPDATE users SET firstName=?, lastName=?, email=? WHERE id=?;"
+	USERS_MYSQL_DB_INSERT_USER_QUERY            = "INSERT INTO users(firstName, lastName, email, dateCreated, status, password) VALUES(?, ?, ?, ?, ?, ?);"
+	USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY         = "UPDATE users SET firstName=?, lastName=?, email=?, status=?, password=? WHERE id=?;"
 	USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY      = "SELECT * from users WHERE id=?;"
 	USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY = "SELECT * from users WHERE status=?;"
 	USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY      = "DELETE FROM users WHERE id=?"
@@ -54,6 +54,8 @@ func (user *User) Save() *errors_utils.APIError {
 		user.LastName,
 		user.Email,
 		user.DateCreated,
+		user.Status,
+		user.Password,
 	)
 	if insertErr != nil {
 		return errors_utils.ParseMySQLError(insertErr)
@@ -84,6 +86,8 @@ func (user *User) PutByUserID() *errors_utils.APIError {
 		user.LastName,
 		user.Email,
 		user.UserID,
+		user.Status,
+		user.Password,
 	)
 	if putErr != nil {
 		return errors_utils.ParseMySQLError(putErr)
@@ -107,7 +111,7 @@ func (user *User) DeleteByUserID() *errors_utils.APIError {
 	return nil
 }
 
-func (user *User) GetUsersByStatus(status string) ([]User, *errors_utils.APIError) {
+func (user *User) GetUsersByStatus(status string) (Users, *errors_utils.APIError) {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY)
 	if prepareErr != nil {
 		return nil, errors_utils.NewInternalServerAPIError(prepareErr.Error())

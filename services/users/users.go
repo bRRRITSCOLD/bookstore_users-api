@@ -2,6 +2,7 @@ package users
 
 import (
 	users_domain "bookstore_users-api/domains/users"
+	crypto_utils "bookstore_users-api/utils/crypto"
 	dates_utils "bookstore_users-api/utils/dates"
 	errors_utils "bookstore_users-api/utils/errors"
 )
@@ -13,6 +14,7 @@ func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIEr
 
 	user.DateCreated = dates_utils.GetNow()
 	user.Status = "active"
+	user.Password = crypto_utils.MD5Hash(user.Password)
 
 	if saveUserErr := user.Save(); saveUserErr != nil {
 		return nil, saveUserErr
@@ -64,6 +66,12 @@ func PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_util
 	if user.Email != "" {
 		currentUser.Email = user.Email
 	}
+	if user.Status != "" {
+		currentUser.Status = user.Status
+	}
+	if user.Password != "" {
+		currentUser.Password = user.Password
+	}
 
 	currentUser.PutByUserID()
 
@@ -80,7 +88,7 @@ func DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError) {
 	return true, nil
 }
 
-func SearchUsers(status string) ([]users_domain.User, *errors_utils.APIError) {
+func SearchUsers(status string) (users_domain.Users, *errors_utils.APIError) {
 	dao := &users_domain.User{}
 	return dao.GetUsersByStatus(status)
 }

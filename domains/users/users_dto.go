@@ -12,8 +12,10 @@ type User struct {
 	Email       string    `json:"email" mysql:"email"`
 	DateCreated time.Time `json:"dateCreated" mysql:"dateCreated"`
 	Status      string    `json:"status"`
-	Password    string    `json:"-"`
+	Password    string    `json:"password"`
 }
+
+type Users []User
 
 func NewUser(user *User) *User {
 	return nil
