@@ -33,7 +33,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, createUserResult)
+	c.JSON(http.StatusCreated, createUserResult.Marshal(c.GetHeader("X-Public") == "true"))
 }
 
 func GetUserByUserID(c *gin.Context) {
@@ -49,7 +49,7 @@ func GetUserByUserID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, getUserResult)
+	c.JSON(http.StatusOK, getUserResult.Marshal(c.GetHeader("X-Public") == "true"))
 }
 
 func PutUserByUserID(c *gin.Context) {
@@ -75,7 +75,7 @@ func PutUserByUserID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updateUserResult)
+	c.JSON(http.StatusOK, updateUserResult.Marshal(c.GetHeader("X-Public") == "true"))
 }
 
 func PatchUserByUserID(c *gin.Context) {
@@ -101,7 +101,7 @@ func PatchUserByUserID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, updateUserResult)
+	c.JSON(http.StatusOK, updateUserResult.Marshal(c.GetHeader("X-Public") == "true"))
 }
 
 func DeleteUserByUserID(c *gin.Context) {
@@ -130,5 +130,5 @@ func SearchUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	c.JSON(http.StatusOK, users.Marshal(c.GetHeader("X-Public") == "true"))
 }
