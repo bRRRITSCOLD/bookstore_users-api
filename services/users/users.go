@@ -7,7 +7,23 @@ import (
 	errors_utils "bookstore_users-api/utils/errors"
 )
 
-func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+var (
+	UsersService usersServiceInterface = &usersService{}
+)
+
+type usersService struct {
+}
+
+type usersServiceInterface interface {
+	CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
+	GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError)
+	PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
+	PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
+	DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError)
+	SearchUsers(status string) (users_domain.Users, *errors_utils.APIError)
+}
+
+func (uS *usersService) CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
 	if validateUserErr := user.Validate(); validateUserErr != nil {
 		return nil, validateUserErr
 	}
@@ -23,7 +39,7 @@ func CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIEr
 	return &user, nil
 }
 
-func GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
 
 	if getUserErr := user.GetByUserID(); getUserErr != nil {
@@ -32,12 +48,12 @@ func GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError) 
 	return &user, nil
 }
 
-func PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
 	if validateUserErr := user.Validate(); validateUserErr != nil {
 		return nil, validateUserErr
 	}
 
-	currentUser, getUserErr := GetUserByUserID(user.UserID)
+	currentUser, getUserErr := uS.GetUserByUserID(user.UserID)
 	if getUserErr != nil {
 		return nil, getUserErr
 	}
@@ -51,8 +67,8 @@ func PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.
 	return currentUser, nil
 }
 
-func PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
-	currentUser, getUserErr := GetUserByUserID(user.UserID)
+func (uS *usersService) PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+	currentUser, getUserErr := uS.GetUserByUserID(user.UserID)
 	if getUserErr != nil {
 		return nil, getUserErr
 	}
@@ -78,7 +94,7 @@ func PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_util
 	return currentUser, nil
 }
 
-func DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError) {
+func (uS *usersService) DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
 
 	if deleteUserErr := user.DeleteByUserID(); deleteUserErr != nil {
@@ -88,7 +104,7 @@ func DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError) {
 	return true, nil
 }
 
-func SearchUsers(status string) (users_domain.Users, *errors_utils.APIError) {
+func (uS *usersService) SearchUsers(status string) (users_domain.Users, *errors_utils.APIError) {
 	dao := &users_domain.User{}
 	return dao.GetUsersByStatus(status)
 }

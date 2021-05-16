@@ -27,7 +27,7 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	createUserResult, createUserErr := users_service.CreateUser(user)
+	createUserResult, createUserErr := users_service.UsersService.CreateUser(user)
 	if createUserErr != nil {
 		c.JSON(createUserErr.Status, createUserErr)
 		return
@@ -43,7 +43,7 @@ func GetUserByUserID(c *gin.Context) {
 		return
 	}
 
-	getUserResult, getUserErr := users_service.GetUserByUserID(userId)
+	getUserResult, getUserErr := users_service.UsersService.GetUserByUserID(userId)
 	if getUserErr != nil {
 		c.JSON(getUserErr.Status, getUserErr)
 		return
@@ -69,7 +69,7 @@ func PutUserByUserID(c *gin.Context) {
 
 	user.UserID = userId
 
-	updateUserResult, updateUserErr := users_service.PutUserByUserID(user)
+	updateUserResult, updateUserErr := users_service.UsersService.PutUserByUserID(user)
 	if updateUserErr != nil {
 		c.JSON(updateUserErr.Status, updateUserErr)
 		return
@@ -95,7 +95,7 @@ func PatchUserByUserID(c *gin.Context) {
 
 	user.UserID = userId
 
-	updateUserResult, updateUserErr := users_service.PatchUserByUserID(user)
+	updateUserResult, updateUserErr := users_service.UsersService.PatchUserByUserID(user)
 	if updateUserErr != nil {
 		c.JSON(updateUserErr.Status, updateUserErr)
 		return
@@ -111,7 +111,7 @@ func DeleteUserByUserID(c *gin.Context) {
 		return
 	}
 
-	deleteUserResult, deleteUserErr := users_service.DeleteUserByUserID(userId)
+	deleteUserResult, deleteUserErr := users_service.UsersService.DeleteUserByUserID(userId)
 	if deleteUserErr != nil {
 		c.JSON(deleteUserErr.Status, deleteUserErr)
 		return
@@ -124,7 +124,7 @@ func DeleteUserByUserID(c *gin.Context) {
 func SearchUsers(c *gin.Context) {
 	status := c.Query("status")
 
-	users, err := users_service.SearchUsers(status)
+	users, err := users_service.UsersService.SearchUsers(status)
 	if err != nil {
 		c.JSON(err.Status, err)
 		return
