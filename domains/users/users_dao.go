@@ -2,6 +2,7 @@ package users_domain
 
 import (
 	users_mysql_db "bookstore_users-api/datasources/users/mysql"
+	"bookstore_users-api/logger"
 	dates_utils "bookstore_users-api/utils/dates"
 	errors_utils "bookstore_users-api/utils/errors"
 	"fmt"
@@ -20,7 +21,8 @@ const (
 func (user *User) GetByUserID() *errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY)
 	if prepareErr != nil {
-		return errors_utils.NewInternalServerAPIError(prepareErr.Error())
+		logger.Error("error when trying to prepare USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY statement", prepareErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	defer stmt.Close()
@@ -29,7 +31,8 @@ func (user *User) GetByUserID() *errors_utils.APIError {
 
 	queryRowResult := stmt.QueryRowx(user.UserID)
 	if scanStructErr := queryRowResult.StructScan(&foundUser); scanStructErr != nil {
-		return errors_utils.ParseMySQLError(scanStructErr)
+		logger.Error("error when scanning struct for USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY result", scanStructErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	user.UserID = foundUser.UserID
@@ -44,7 +47,8 @@ func (user *User) GetByUserID() *errors_utils.APIError {
 func (user *User) Save() *errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_INSERT_USER_QUERY)
 	if prepareErr != nil {
-		return errors_utils.NewInternalServerAPIError(prepareErr.Error())
+		logger.Error("error when trying to prepare USERS_MYSQL_DB_INSERT_USER_QUERY statement", prepareErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	defer stmt.Close()
@@ -58,12 +62,14 @@ func (user *User) Save() *errors_utils.APIError {
 		user.Password,
 	)
 	if insertErr != nil {
-		return errors_utils.ParseMySQLError(insertErr)
+		logger.Error("error when inserting row for USERS_MYSQL_DB_INSERT_USER_QUERY", insertErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	userId, lastInsertedIDErr := insertResult.LastInsertId()
 	if lastInsertedIDErr != nil {
-		return errors_utils.NewInternalServerAPIError(lastInsertedIDErr.Error())
+		logger.Error("error getting last inserted id for USERS_MYSQL_DB_INSERT_USER_QUERY", lastInsertedIDErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	user.UserID = userId
@@ -74,7 +80,8 @@ func (user *User) Save() *errors_utils.APIError {
 func (user *User) PutByUserID() *errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY)
 	if prepareErr != nil {
-		return errors_utils.NewInternalServerAPIError(prepareErr.Error())
+		logger.Error("error when trying to prepare USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY statement", prepareErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	defer stmt.Close()
@@ -90,7 +97,8 @@ func (user *User) PutByUserID() *errors_utils.APIError {
 		user.Password,
 	)
 	if putErr != nil {
-		return errors_utils.ParseMySQLError(putErr)
+		logger.Error("error when putting row for USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY", putErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	return nil
@@ -99,13 +107,15 @@ func (user *User) PutByUserID() *errors_utils.APIError {
 func (user *User) DeleteByUserID() *errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY)
 	if prepareErr != nil {
-		return errors_utils.NewInternalServerAPIError(prepareErr.Error())
+		logger.Error("error when trying to prepare USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY statement", prepareErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	defer stmt.Close()
 
 	if _, deleteErr := stmt.Exec(user.UserID); deleteErr != nil {
-		return errors_utils.ParseMySQLError(deleteErr)
+		logger.Error("error when deleting row for USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY", deleteErr)
+		return errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	return nil
@@ -114,14 +124,16 @@ func (user *User) DeleteByUserID() *errors_utils.APIError {
 func (user *User) GetUsersByStatus(status string) (Users, *errors_utils.APIError) {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY)
 	if prepareErr != nil {
-		return nil, errors_utils.NewInternalServerAPIError(prepareErr.Error())
+		logger.Error("error when trying to prepare USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY statement", prepareErr)
+		return nil, errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	defer stmt.Close()
 
 	queryxRows, queryxErr := stmt.Queryx(status)
 	if queryxErr != nil {
-		return nil, errors_utils.NewInternalServerAPIError(queryxErr.Error())
+		logger.Error("error when running query for USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY", queryxErr)
+		return nil, errors_utils.NewInternalServerAPIError("internal server error")
 	}
 
 	defer queryxRows.Close()
@@ -132,7 +144,8 @@ func (user *User) GetUsersByStatus(status string) (Users, *errors_utils.APIError
 		var foundUser User
 
 		if scanStructErr := queryxRows.StructScan(&foundUser); scanStructErr != nil {
-			return nil, errors_utils.ParseMySQLError(scanStructErr)
+			logger.Error("error when scanning stuct for USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY", queryxErr)
+			return nil, errors_utils.NewInternalServerAPIError("internal server error")
 		}
 
 		foundUsers = append(foundUsers, foundUser)
@@ -143,15 +156,4 @@ func (user *User) GetUsersByStatus(status string) (Users, *errors_utils.APIError
 	}
 
 	return foundUsers, nil
-	// if scanStructErr := queryRowResult.StructScan(&foundUser); scanStructErr != nil {
-	// 	return errors_utils.ParseMySQLError(scanStructErr)
-	// }
-
-	// user.UserID = foundUser.UserID
-	// user.Email = foundUser.Email
-	// user.FirstName = foundUser.FirstName
-	// user.LastName = foundUser.LastName
-	// user.DateCreated = foundUser.DateCreated
-
-	// return nil
 }
