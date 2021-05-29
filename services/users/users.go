@@ -21,6 +21,7 @@ type usersServiceInterface interface {
 	PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
 	DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError)
 	SearchUsers(status string) (users_domain.Users, *errors_utils.APIError)
+	LoginUser(users_domain.UserLoginRequest) (*users_domain.User, *errors_utils.APIError)
 }
 
 func (uS *usersService) CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
@@ -29,7 +30,7 @@ func (uS *usersService) CreateUser(user users_domain.User) (*users_domain.User, 
 	}
 
 	user.DateCreated = dates_utils.GetNow()
-	user.Status = "active"
+	user.Status = users_domain.USER_ACTIVE_STATUS
 	user.Password = crypto_utils.MD5Hash(user.Password)
 
 	if saveUserErr := user.Save(); saveUserErr != nil {
@@ -44,6 +45,15 @@ func (uS *usersService) GetUserByUserID(userId int64) (*users_domain.User, *erro
 
 	if getUserErr := user.GetByUserID(); getUserErr != nil {
 		return nil, getUserErr
+	}
+	return &user, nil
+}
+
+func (uS *usersService) LoginUser(ulr users_domain.UserLoginRequest) (*users_domain.User, *errors_utils.APIError) {
+	user := users_domain.User{Email: ulr.Email, Password: crypto_utils.MD5Hash(ulr.Password)}
+
+	if GetUserByEmailAndPasswordErr := user.GetUserByEmailAndPassword(); GetUserByEmailAndPasswordErr != nil {
+		return nil, GetUserByEmailAndPasswordErr
 	}
 	return &user, nil
 }

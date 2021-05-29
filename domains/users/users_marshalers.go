@@ -11,7 +11,7 @@ type PublicUser struct {
 	// LastName    string    `json:"lastName" mysql:"lastName"`
 	// Email       string    `json:"email" mysql:"email"`
 	DateCreated time.Time `json:"dateCreated" mysql:"dateCreated"`
-	Status      string    `json:"status"`
+	Status      string    `json:"status" mysql:"status"`
 	// Password    string    `json:"password"`
 }
 
@@ -21,7 +21,7 @@ type PrivateUser struct {
 	LastName    string    `json:"lastName" mysql:"lastName"`
 	Email       string    `json:"email" mysql:"email"`
 	DateCreated time.Time `json:"dateCreated" mysql:"dateCreated"`
-	Status      string    `json:"status"`
+	Status      string    `json:"status" mysql:"status"`
 	// Password    string    `json:"password"`
 }
 
