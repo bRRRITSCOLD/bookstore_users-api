@@ -52,6 +52,24 @@ func GetUserByUserID(c *gin.Context) {
 	c.JSON(http.StatusOK, getUserResult.Marshal(c.GetHeader("X-Public") == "true"))
 }
 
+func LoginUser(c *gin.Context) {
+	var userLoginRequest users_domain.UserLoginRequest
+
+	if shouldBindJSONErr := c.ShouldBindJSON(&userLoginRequest); shouldBindJSONErr != nil {
+		apiError := errors_utils.NewBadRequestAPIError("invalid json body")
+		c.JSON(apiError.Status, apiError)
+		return
+	}
+
+	user, loginUserErr := users_service.UsersService.LoginUser(userLoginRequest)
+	if loginUserErr != nil {
+		c.JSON(loginUserErr.Status, loginUserErr)
+		return
+	}
+
+	c.JSON(http.StatusCreated, user.Marshal(c.GetHeader("X-Public") == "true"))
+}
+
 func PutUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
