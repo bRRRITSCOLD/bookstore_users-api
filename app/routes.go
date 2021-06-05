@@ -12,6 +12,7 @@ func initRoutes() {
 	// users
 	router.POST("/users", users_controllers.CreateUser)
 	router.GET("/users/search", users_controllers.SearchUsers)
+	router.POST("/users/login", users_controllers.LoginUser)
 	router.GET("/users/:userId", users_controllers.GetUserByUserID)
 	router.PUT("/users/:userId", users_controllers.PutUserByUserID)
 	router.PATCH("/users/:userId", users_controllers.PatchUserByUserID)

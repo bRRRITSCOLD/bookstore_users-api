@@ -5,14 +5,19 @@ import (
 	"time"
 )
 
+const (
+	USER_ACTIVE_STATUS   = "active"
+	USER_INACTIVE_STATUS = "inactive"
+)
+
 type User struct {
 	UserID      int64     `json:"userId" mysql:"id"`
 	FirstName   string    `json:"firstName" mysql:"firstName"`
 	LastName    string    `json:"lastName" mysql:"lastName"`
 	Email       string    `json:"email" mysql:"email"`
 	DateCreated time.Time `json:"dateCreated" mysql:"dateCreated"`
-	Status      string    `json:"status"`
-	Password    string    `json:"password"`
+	Status      string    `json:"status" mysql:"status"`
+	Password    string    `json:"password" mysql:"password"`
 }
 
 type Users []User
