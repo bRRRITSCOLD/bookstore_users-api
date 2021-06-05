@@ -15,7 +15,7 @@ func StartApp() {
 	initRoutes()
 
 	logger.Info("{}app::#StartApp::starting server")
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":3000"); err != nil {
 		panic(err)
 	}
 	logger.Info("{}app::#StartApp::started server")
