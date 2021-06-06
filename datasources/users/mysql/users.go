@@ -1,9 +1,10 @@
 package users_mysql_db
 
 import (
-	errors_utils "bookstore_users-api/utils/errors"
 	"os"
 	"strings"
+
+	errors_utils "github.com/bRRRITSCOLD/bookstore_utils-go/errors"
 
 	"fmt"
 	"log"

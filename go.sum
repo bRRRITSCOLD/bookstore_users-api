@@ -4,6 +4,8 @@ github.com/bRRRITSCOLD/bookstore_oauth-go v0.0.0-20210605225658-17f5700b2ab6 h1:
 github.com/bRRRITSCOLD/bookstore_oauth-go v0.0.0-20210605225658-17f5700b2ab6/go.mod h1:GT0ci2JAoUuJedpI612QvJxo1gSmv2DbXoMxSS2KUUk=
 github.com/bRRRITSCOLD/bookstore_oauth-go v0.0.0-20210606163912-b25149652f86 h1:s1KHAIkM5+N9Ab5mjFYhQBv1M5KpYHWf2+sxHXliAi4=
 github.com/bRRRITSCOLD/bookstore_oauth-go v0.0.0-20210606163912-b25149652f86/go.mod h1:GT0ci2JAoUuJedpI612QvJxo1gSmv2DbXoMxSS2KUUk=
+github.com/bRRRITSCOLD/bookstore_utils-go v0.0.0-20210606223908-1670bfe27a08 h1:JNX0AInEmDhHHG4LlxZHcMYv5PeYFIIBDvsdmx97BJM=
+github.com/bRRRITSCOLD/bookstore_utils-go v0.0.0-20210606223908-1670bfe27a08/go.mod h1:LnQeTPCZgeZVuab0VdeQ6neWNmUmvnEF9YzuMKHlNmI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/gin-contrib/sse v0.1.0 h1:Y/yl/+YNO8GZSjAhjMsSuLt29uWRFHdHYUb5lYOV9qE=

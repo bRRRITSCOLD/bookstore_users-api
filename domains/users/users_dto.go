@@ -1,8 +1,10 @@
 package users_domain
 
 import (
-	errorsUtils "bookstore_users-api/utils/errors"
+	"errors"
 	"time"
+
+	errorsUtils "github.com/bRRRITSCOLD/bookstore_utils-go/errors"
 )
 
 const (
@@ -28,11 +30,11 @@ func NewUser(user *User) *User {
 
 func (user *User) Validate() *errorsUtils.APIError {
 	if user.Email == "" {
-		return errorsUtils.NewBadRequestAPIError("invalid email address")
+		return errorsUtils.NewBadRequestAPIError("invalid email address", errors.New("validation error"))
 	}
 
 	if user.Password == "" {
-		return errorsUtils.NewBadRequestAPIError("invalid password")
+		return errorsUtils.NewBadRequestAPIError("invalid password", errors.New("validation error"))
 	}
 	return nil
 }

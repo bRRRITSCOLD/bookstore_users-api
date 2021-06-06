@@ -3,9 +3,10 @@ package users_controllers
 import (
 	users_domain "bookstore_users-api/domains/users"
 	users_service "bookstore_users-api/services/users"
-	errors_utils "bookstore_users-api/utils/errors"
 	"net/http"
 	"strconv"
+
+	errors_utils "github.com/bRRRITSCOLD/bookstore_utils-go/errors"
 
 	"github.com/bRRRITSCOLD/bookstore_oauth-go/oauth"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ import (
 func parseUserIDFromRequestPath(requestPathUserID string) (int64, *errors_utils.APIError) {
 	userId, userIdErr := strconv.ParseInt(requestPathUserID, 10, 64)
 	if userIdErr != nil {
-		return 0, errors_utils.NewBadRequestAPIError("invalid user id")
+		return 0, errors_utils.NewBadRequestAPIError("invalid user id", userIdErr)
 	}
 	return userId, nil
 }
@@ -25,7 +26,7 @@ func CreateUser(c *gin.Context) {
 	var user users_domain.User
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
-		apiError := errors_utils.NewBadRequestAPIError("invalid json body")
+		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
 		c.JSON(apiError.Status, apiError)
 		return
 	}
@@ -70,7 +71,7 @@ func LoginUser(c *gin.Context) {
 	var userLoginRequest users_domain.UserLoginRequest
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&userLoginRequest); shouldBindJSONErr != nil {
-		apiError := errors_utils.NewBadRequestAPIError("invalid json body")
+		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
 		c.JSON(apiError.Status, apiError)
 		return
 	}
@@ -94,7 +95,7 @@ func PutUserByUserID(c *gin.Context) {
 	var user users_domain.User
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
-		apiError := errors_utils.NewBadRequestAPIError("invalid json body")
+		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
 		c.JSON(apiError.Status, apiError)
 		return
 	}
@@ -120,7 +121,7 @@ func PatchUserByUserID(c *gin.Context) {
 	var user users_domain.User
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
-		apiError := errors_utils.NewBadRequestAPIError("invalid json body")
+		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
 		c.JSON(apiError.Status, apiError)
 		return
 	}
