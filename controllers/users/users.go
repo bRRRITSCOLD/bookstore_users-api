@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/bRRRITSCOLD/bookstore_oauth-go/oauth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +20,8 @@ func parseUserIDFromRequestPath(requestPathUserID string) (int64, *errors_utils.
 }
 
 func CreateUser(c *gin.Context) {
+	oauth.IsPublic(c.Request)
+
 	var user users_domain.User
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
@@ -37,6 +40,12 @@ func CreateUser(c *gin.Context) {
 }
 
 func GetUserByUserID(c *gin.Context) {
+	authenticateUserRequestErr := oauth.AuthenticateRequest(c.Request)
+	if authenticateUserRequestErr != nil {
+		c.JSON(authenticateUserRequestErr.Status, authenticateUserRequestErr)
+		return
+	}
+
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
 		c.JSON(userIdErr.Status, userIdErr)
@@ -49,7 +58,12 @@ func GetUserByUserID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, getUserResult.Marshal(c.GetHeader("X-Public") == "true"))
+	if oauth.GetCallerID(c.Request) == getUserResult.UserID {
+		c.JSON(http.StatusOK, getUserResult.Marshal(false))
+		return
+	}
+
+	c.JSON(http.StatusOK, getUserResult.Marshal(oauth.IsPublic(c.Request)))
 }
 
 func LoginUser(c *gin.Context) {

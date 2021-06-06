@@ -23,14 +23,14 @@ const (
 
 var (
 	Client *sqlx.DB
-
-	username = os.Getenv(USERS_MYSQL_DB_USERNAME)
-	password = os.Getenv(USERS_MYSQL_DB_PASSWORD)
-	host     = os.Getenv(USERS_MYSQL_DB_HOST)
-	database = os.Getenv(USERS_MYSQL_DB_DATABASE)
 )
 
-func init() {
+func Init() {
+	username := os.Getenv(USERS_MYSQL_DB_USERNAME)
+	password := os.Getenv(USERS_MYSQL_DB_PASSWORD)
+	host := os.Getenv(USERS_MYSQL_DB_HOST)
+	database := os.Getenv(USERS_MYSQL_DB_DATABASE)
+
 	datasourceName := fmt.Sprintf(
 		"%s:%s@tcp(%s)/%s?charset=utf8&parseTime=true",
 		username,
