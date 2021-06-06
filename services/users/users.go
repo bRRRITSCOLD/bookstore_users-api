@@ -2,9 +2,10 @@ package users
 
 import (
 	users_domain "bookstore_users-api/domains/users"
-	crypto_utils "bookstore_users-api/utils/crypto"
-	dates_utils "bookstore_users-api/utils/dates"
-	errors_utils "bookstore_users-api/utils/errors"
+
+	crypto_utils "github.com/bRRRITSCOLD/bookstore_utils-go/crypto"
+	dates_utils "github.com/bRRRITSCOLD/bookstore_utils-go/dates"
+	errors_utils "github.com/bRRRITSCOLD/bookstore_utils-go/errors"
 )
 
 var (
