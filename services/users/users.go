@@ -16,16 +16,16 @@ type usersService struct {
 }
 
 type usersServiceInterface interface {
-	CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
-	GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError)
-	PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
-	PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError)
-	DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError)
-	SearchUsers(status string) (users_domain.Users, *errors_utils.APIError)
-	LoginUser(users_domain.UserLoginRequest) (*users_domain.User, *errors_utils.APIError)
+	CreateUser(user users_domain.User) (*users_domain.User, errors_utils.APIError)
+	GetUserByUserID(userId int64) (*users_domain.User, errors_utils.APIError)
+	PutUserByUserID(user users_domain.User) (*users_domain.User, errors_utils.APIError)
+	PatchUserByUserID(user users_domain.User) (*users_domain.User, errors_utils.APIError)
+	DeleteUserByUserID(userId int64) (bool, errors_utils.APIError)
+	SearchUsers(status string) (users_domain.Users, errors_utils.APIError)
+	LoginUser(users_domain.UserLoginRequest) (*users_domain.User, errors_utils.APIError)
 }
 
-func (uS *usersService) CreateUser(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) CreateUser(user users_domain.User) (*users_domain.User, errors_utils.APIError) {
 	if validateUserErr := user.Validate(); validateUserErr != nil {
 		return nil, validateUserErr
 	}
@@ -41,7 +41,7 @@ func (uS *usersService) CreateUser(user users_domain.User) (*users_domain.User, 
 	return &user, nil
 }
 
-func (uS *usersService) GetUserByUserID(userId int64) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) GetUserByUserID(userId int64) (*users_domain.User, errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
 
 	if getUserErr := user.GetByUserID(); getUserErr != nil {
@@ -50,7 +50,7 @@ func (uS *usersService) GetUserByUserID(userId int64) (*users_domain.User, *erro
 	return &user, nil
 }
 
-func (uS *usersService) LoginUser(ulr users_domain.UserLoginRequest) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) LoginUser(ulr users_domain.UserLoginRequest) (*users_domain.User, errors_utils.APIError) {
 	user := users_domain.User{Email: ulr.Email, Password: crypto_utils.MD5Hash(ulr.Password)}
 
 	if GetUserByEmailAndPasswordErr := user.GetUserByEmailAndPassword(); GetUserByEmailAndPasswordErr != nil {
@@ -59,7 +59,7 @@ func (uS *usersService) LoginUser(ulr users_domain.UserLoginRequest) (*users_dom
 	return &user, nil
 }
 
-func (uS *usersService) PutUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) PutUserByUserID(user users_domain.User) (*users_domain.User, errors_utils.APIError) {
 	if validateUserErr := user.Validate(); validateUserErr != nil {
 		return nil, validateUserErr
 	}
@@ -78,7 +78,7 @@ func (uS *usersService) PutUserByUserID(user users_domain.User) (*users_domain.U
 	return currentUser, nil
 }
 
-func (uS *usersService) PatchUserByUserID(user users_domain.User) (*users_domain.User, *errors_utils.APIError) {
+func (uS *usersService) PatchUserByUserID(user users_domain.User) (*users_domain.User, errors_utils.APIError) {
 	currentUser, getUserErr := uS.GetUserByUserID(user.UserID)
 	if getUserErr != nil {
 		return nil, getUserErr
@@ -105,7 +105,7 @@ func (uS *usersService) PatchUserByUserID(user users_domain.User) (*users_domain
 	return currentUser, nil
 }
 
-func (uS *usersService) DeleteUserByUserID(userId int64) (bool, *errors_utils.APIError) {
+func (uS *usersService) DeleteUserByUserID(userId int64) (bool, errors_utils.APIError) {
 	user := users_domain.User{UserID: userId}
 
 	if deleteUserErr := user.DeleteByUserID(); deleteUserErr != nil {
@@ -115,7 +115,7 @@ func (uS *usersService) DeleteUserByUserID(userId int64) (bool, *errors_utils.AP
 	return true, nil
 }
 
-func (uS *usersService) SearchUsers(status string) (users_domain.Users, *errors_utils.APIError) {
+func (uS *usersService) SearchUsers(status string) (users_domain.Users, errors_utils.APIError) {
 	dao := &users_domain.User{}
 	return dao.GetUsersByStatus(status)
 }

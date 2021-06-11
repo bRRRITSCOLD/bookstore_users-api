@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func parseUserIDFromRequestPath(requestPathUserID string) (int64, *errors_utils.APIError) {
+func parseUserIDFromRequestPath(requestPathUserID string) (int64, errors_utils.APIError) {
 	userId, userIdErr := strconv.ParseInt(requestPathUserID, 10, 64)
 	if userIdErr != nil {
 		return 0, errors_utils.NewBadRequestAPIError("invalid user id", userIdErr)
@@ -27,13 +27,13 @@ func CreateUser(c *gin.Context) {
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
 		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
-		c.JSON(apiError.Status, apiError)
+		c.JSON(apiError.Status(), apiError)
 		return
 	}
 
 	createUserResult, createUserErr := users_service.UsersService.CreateUser(user)
 	if createUserErr != nil {
-		c.JSON(createUserErr.Status, createUserErr)
+		c.JSON(createUserErr.Status(), createUserErr)
 		return
 	}
 
@@ -43,19 +43,19 @@ func CreateUser(c *gin.Context) {
 func GetUserByUserID(c *gin.Context) {
 	authenticateUserRequestErr := oauth.AuthenticateRequest(c.Request)
 	if authenticateUserRequestErr != nil {
-		c.JSON(authenticateUserRequestErr.Status, authenticateUserRequestErr)
+		c.JSON(authenticateUserRequestErr.Status(), authenticateUserRequestErr)
 		return
 	}
 
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
-		c.JSON(userIdErr.Status, userIdErr)
+		c.JSON(userIdErr.Status(), userIdErr)
 		return
 	}
 
 	getUserResult, getUserErr := users_service.UsersService.GetUserByUserID(userId)
 	if getUserErr != nil {
-		c.JSON(getUserErr.Status, getUserErr)
+		c.JSON(getUserErr.Status(), getUserErr)
 		return
 	}
 
@@ -72,13 +72,13 @@ func LoginUser(c *gin.Context) {
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&userLoginRequest); shouldBindJSONErr != nil {
 		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
-		c.JSON(apiError.Status, apiError)
+		c.JSON(apiError.Status(), apiError)
 		return
 	}
 
 	user, loginUserErr := users_service.UsersService.LoginUser(userLoginRequest)
 	if loginUserErr != nil {
-		c.JSON(loginUserErr.Status, loginUserErr)
+		c.JSON(loginUserErr.Status(), loginUserErr)
 		return
 	}
 
@@ -88,7 +88,7 @@ func LoginUser(c *gin.Context) {
 func PutUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
-		c.JSON(userIdErr.Status, userIdErr)
+		c.JSON(userIdErr.Status(), userIdErr)
 		return
 	}
 
@@ -96,7 +96,7 @@ func PutUserByUserID(c *gin.Context) {
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
 		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
-		c.JSON(apiError.Status, apiError)
+		c.JSON(apiError.Status(), apiError)
 		return
 	}
 
@@ -104,7 +104,7 @@ func PutUserByUserID(c *gin.Context) {
 
 	updateUserResult, updateUserErr := users_service.UsersService.PutUserByUserID(user)
 	if updateUserErr != nil {
-		c.JSON(updateUserErr.Status, updateUserErr)
+		c.JSON(updateUserErr.Status(), updateUserErr)
 		return
 	}
 
@@ -114,7 +114,7 @@ func PutUserByUserID(c *gin.Context) {
 func PatchUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
-		c.JSON(userIdErr.Status, userIdErr)
+		c.JSON(userIdErr.Status(), userIdErr)
 		return
 	}
 
@@ -122,7 +122,7 @@ func PatchUserByUserID(c *gin.Context) {
 
 	if shouldBindJSONErr := c.ShouldBindJSON(&user); shouldBindJSONErr != nil {
 		apiError := errors_utils.NewBadRequestAPIError("invalid json body", shouldBindJSONErr)
-		c.JSON(apiError.Status, apiError)
+		c.JSON(apiError.Status(), apiError)
 		return
 	}
 
@@ -130,7 +130,7 @@ func PatchUserByUserID(c *gin.Context) {
 
 	updateUserResult, updateUserErr := users_service.UsersService.PatchUserByUserID(user)
 	if updateUserErr != nil {
-		c.JSON(updateUserErr.Status, updateUserErr)
+		c.JSON(updateUserErr.Status(), updateUserErr)
 		return
 	}
 
@@ -140,13 +140,13 @@ func PatchUserByUserID(c *gin.Context) {
 func DeleteUserByUserID(c *gin.Context) {
 	userId, userIdErr := parseUserIDFromRequestPath(c.Param("userId"))
 	if userIdErr != nil {
-		c.JSON(userIdErr.Status, userIdErr)
+		c.JSON(userIdErr.Status(), userIdErr)
 		return
 	}
 
 	deleteUserResult, deleteUserErr := users_service.UsersService.DeleteUserByUserID(userId)
 	if deleteUserErr != nil {
-		c.JSON(deleteUserErr.Status, deleteUserErr)
+		c.JSON(deleteUserErr.Status(), deleteUserErr)
 		return
 	}
 
@@ -159,7 +159,7 @@ func SearchUsers(c *gin.Context) {
 
 	users, err := users_service.UsersService.SearchUsers(status)
 	if err != nil {
-		c.JSON(err.Status, err)
+		c.JSON(err.Status(), err)
 		return
 	}
 
