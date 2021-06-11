@@ -28,7 +28,7 @@ func NewUser(user *User) *User {
 	return nil
 }
 
-func (user *User) Validate() *errorsUtils.APIError {
+func (user *User) Validate() errorsUtils.APIError {
 	if user.Email == "" {
 		return errorsUtils.NewBadRequestAPIError("invalid email address", errors.New("validation error"))
 	}

@@ -21,7 +21,7 @@ const (
 	USERS_MYSQL_DB_NO_ROWS                                 = "sql: no rows in result set"
 )
 
-func (user *User) GetByUserID() *errors_utils.APIError {
+func (user *User) GetByUserID() errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY)
 	if prepareErr != nil {
 		logger.Error("error when trying to prepare USERS_MYSQL_DB_SELECT_USER_BY_ID_QUERY statement", prepareErr)
@@ -48,7 +48,7 @@ func (user *User) GetByUserID() *errors_utils.APIError {
 	return nil
 }
 
-func (user *User) GetUserByEmailAndPassword() *errors_utils.APIError {
+func (user *User) GetUserByEmailAndPassword() errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USER_BY_EMAIL_AND_PASSWORD_QUERY)
 	if prepareErr != nil {
 		logger.Error("error when trying to prepare USERS_MYSQL_DB_SELECT_USER_BY_EMAIL_AND_PASSWORD_QUERY statement", prepareErr)
@@ -75,7 +75,7 @@ func (user *User) GetUserByEmailAndPassword() *errors_utils.APIError {
 	return nil
 }
 
-func (user *User) Save() *errors_utils.APIError {
+func (user *User) Save() errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_INSERT_USER_QUERY)
 	if prepareErr != nil {
 		logger.Error("error when trying to prepare USERS_MYSQL_DB_INSERT_USER_QUERY statement", prepareErr)
@@ -108,7 +108,7 @@ func (user *User) Save() *errors_utils.APIError {
 	return nil
 }
 
-func (user *User) PutByUserID() *errors_utils.APIError {
+func (user *User) PutByUserID() errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY)
 	if prepareErr != nil {
 		logger.Error("error when trying to prepare USERS_MYSQL_DB_PUT_USER_BY_ID_QUERY statement", prepareErr)
@@ -135,7 +135,7 @@ func (user *User) PutByUserID() *errors_utils.APIError {
 	return nil
 }
 
-func (user *User) DeleteByUserID() *errors_utils.APIError {
+func (user *User) DeleteByUserID() errors_utils.APIError {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY)
 	if prepareErr != nil {
 		logger.Error("error when trying to prepare USERS_MYSQL_DB_DELETE_USER_BY_ID_QUERY statement", prepareErr)
@@ -152,7 +152,7 @@ func (user *User) DeleteByUserID() *errors_utils.APIError {
 	return nil
 }
 
-func (user *User) GetUsersByStatus(status string) (Users, *errors_utils.APIError) {
+func (user *User) GetUsersByStatus(status string) (Users, errors_utils.APIError) {
 	stmt, prepareErr := users_mysql_db.Client.Preparex(USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY)
 	if prepareErr != nil {
 		logger.Error("error when trying to prepare USERS_MYSQL_DB_SELECT_USERS_BY_STATUS_QUERY statement", prepareErr)
